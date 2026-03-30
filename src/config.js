@@ -11,4 +11,4 @@
 // Otherwise fall back to the value hardcoded below.
 export const GOOGLE_CLIENT_ID =
   import.meta.env.VITE_GOOGLE_CLIENT_ID ||
-  'c793996610723-62qkcl0luckn618agu0fnip6sku1mtcb.apps.googleusercontent.com'
+  '793996610723-62qkcl0luckn618agu0fnip6sku1mtcb.apps.googleusercontent.com'

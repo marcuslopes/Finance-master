@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthContext'
 import { AuthGuard } from './auth/AuthGuard'
 import { ToastProvider } from './components/ui/Toast'
@@ -13,7 +13,7 @@ import SettingsPage from './pages/SettingsPage'
 
 export default function App() {
   return (
-    <BrowserRouter basename="/Finance-master">
+    <HashRouter>
       <ToastProvider>
       <AuthProvider>
         <Routes>
@@ -38,6 +38,6 @@ export default function App() {
         </Routes>
       </AuthProvider>
       </ToastProvider>
-    </BrowserRouter>
+    </HashRouter>
   )
 }

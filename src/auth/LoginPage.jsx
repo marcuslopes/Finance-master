@@ -36,8 +36,6 @@ export default function LoginPage() {
     },
   })
 
-  const clientIdSet = !!import.meta.env.VITE_GOOGLE_CLIENT_ID
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
@@ -46,13 +44,6 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold text-gray-900">CanWealth</h1>
           <p className="text-gray-500 text-sm mt-1">Your free Canadian wealth tracker</p>
         </div>
-
-        {!clientIdSet && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-6 text-sm text-amber-800">
-            <p className="font-medium mb-1">Setup required</p>
-            <p>VITE_GOOGLE_CLIENT_ID is not set. See README.</p>
-          </div>
-        )}
 
         <button
           onClick={() => login()}

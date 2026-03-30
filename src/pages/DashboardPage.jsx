@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../auth/useAuth'
 
 export default function DashboardPage() {
-  const { idToken } = useAuth()
+  const { accessToken } = useAuth()
   const navigate = useNavigate()
   const { accounts, loading: accLoading } = useAccounts()
   const { balances, loading: balLoading } = useLatestBalances()
@@ -25,9 +25,9 @@ export default function DashboardPage() {
   const [allSnapshots, setAllSnapshots] = useState([])
 
   useEffect(() => {
-    if (!idToken) return
-    listSnapshots(idToken).then(data => setAllSnapshots(data || [])).catch(() => {})
-  }, [idToken])
+    if (!accessToken) return
+    listSnapshots(accessToken).then(data => setAllSnapshots(data || [])).catch(() => {})
+  }, [accessToken])
 
   const { total, byAccount } = useNetWorth(balances, accounts)
   const history = useNetWorthHistory(allSnapshots)

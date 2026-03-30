@@ -3,24 +3,24 @@ import { useAuth } from '../auth/useAuth'
 import { getLatestBalances, listSnapshots, recordSnapshot } from '../api/balances'
 
 export function useLatestBalances() {
-  const { idToken } = useAuth()
+  const { accessToken } = useAuth()
   const [balances, setBalances] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   const fetch = useCallback(async () => {
-    if (!idToken) return
+    if (!accessToken) return
     setLoading(true)
     setError(null)
     try {
-      const data = await getLatestBalances(idToken)
+      const data = await getLatestBalances(accessToken)
       setBalances(data || [])
     } catch (e) {
       setError(e.message)
     } finally {
       setLoading(false)
     }
-  }, [idToken])
+  }, [accessToken])
 
   useEffect(() => { fetch() }, [fetch])
 
@@ -28,25 +28,25 @@ export function useLatestBalances() {
 }
 
 export function useSnapshots(accountId) {
-  const { idToken } = useAuth()
+  const { accessToken } = useAuth()
   const [snapshots, setSnapshots] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!idToken) return
+    if (!accessToken) return
     setLoading(true)
-    listSnapshots(idToken, accountId)
+    listSnapshots(accessToken, accountId)
       .then(data => setSnapshots(data || []))
       .catch(() => setSnapshots([]))
       .finally(() => setLoading(false))
-  }, [idToken, accountId])
+  }, [accessToken, accountId])
 
   const saveSnapshot = useCallback(async (accId, date, balanceCad, balanceNative, source) => {
-    const result = await recordSnapshot(idToken, accId, date, balanceCad, balanceNative, source)
-    const data = await listSnapshots(idToken, accountId)
+    const result = await recordSnapshot(accessToken, accId, date, balanceCad, balanceNative, source)
+    const data = await listSnapshots(accessToken, accountId)
     setSnapshots(data || [])
     return result
-  }, [idToken, accountId])
+  }, [accessToken, accountId])
 
   return { snapshots, loading, saveSnapshot }
 }

@@ -14,7 +14,7 @@ import { AlertCircle } from 'lucide-react'
  * from Step3 (already normalized).
  */
 export default function Step4_Preview({ account, rows, filename, onConfirm, onBack }) {
-  const { idToken } = useAuth()
+  const { accessToken } = useAuth()
   const [importing, setImporting] = useState(false)
   const [error, setError] = useState('')
 
@@ -28,9 +28,9 @@ export default function Step4_Preview({ account, rows, filename, onConfirm, onBa
     try {
       const batchId = 'batch_' + uuid().replace(/-/g, '').substring(0, 16)
 
-      const result = await importTransactions(idToken, batchId, account.account_id, normalizedRows)
+      const result = await importTransactions(accessToken, batchId, account.account_id, normalizedRows)
 
-      await logImport(idToken, {
+      await logImport(accessToken, {
         batch_id: batchId,
         account_id: account.account_id,
         institution: account.institution,

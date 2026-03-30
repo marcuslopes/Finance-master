@@ -3,7 +3,7 @@ import { useAuth } from '../auth/useAuth'
 import { listTransactions } from '../api/transactions'
 
 export function useTransactions(filters = {}) {
-  const { idToken } = useAuth()
+  const { accessToken } = useAuth()
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -11,18 +11,18 @@ export function useTransactions(filters = {}) {
   const fetchKey = JSON.stringify(filters)
 
   const fetch = useCallback(async () => {
-    if (!idToken) return
+    if (!accessToken) return
     setLoading(true)
     setError(null)
     try {
-      const data = await listTransactions(idToken, filters)
+      const data = await listTransactions(accessToken, filters)
       setTransactions(data || [])
     } catch (e) {
       setError(e.message)
     } finally {
       setLoading(false)
     }
-  }, [idToken, fetchKey])
+  }, [accessToken, fetchKey])
 
   useEffect(() => { fetch() }, [fetch])
 

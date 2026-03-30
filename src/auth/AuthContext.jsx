@@ -4,53 +4,52 @@ import { googleLogout } from '@react-oauth/google'
 export const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [idToken, setIdToken] = useState(() => sessionStorage.getItem('cw_token') || null)
+  const [accessToken, setAccessTokenState] = useState(
+    () => sessionStorage.getItem('cw_access_token') || null
+  )
   const [user, setUser] = useState(() => {
     const u = sessionStorage.getItem('cw_user')
     return u ? JSON.parse(u) : null
   })
-  const tokenExpiryRef = useRef(null)
+  const expiryTimerRef = useRef(null)
 
-  const login = useCallback((credentialResponse) => {
-    const token = credentialResponse.credential
-    if (!token) return
+  const storeToken = useCallback((token, expiresIn, userInfo) => {
+    setAccessTokenState(token)
+    sessionStorage.setItem('cw_access_token', token)
 
-    // Decode the JWT payload (no signature check — that's done server-side in Apps Script)
-    const parts = token.split('.')
-    if (parts.length !== 3) return
-    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))
-
-    const userInfo = {
-      sub: payload.sub,
-      name: payload.name || '',
-      email: payload.email || '',
-      picture: payload.picture || '',
+    if (userInfo) {
+      setUser(userInfo)
+      sessionStorage.setItem('cw_user', JSON.stringify(userInfo))
     }
 
-    setIdToken(token)
-    setUser(userInfo)
-    sessionStorage.setItem('cw_token', token)
-    sessionStorage.setItem('cw_user', JSON.stringify(userInfo))
-
-    // Auto-logout when token expires (Google tokens live 1 hour)
-    if (tokenExpiryRef.current) clearTimeout(tokenExpiryRef.current)
-    const expiresIn = (payload.exp * 1000 - Date.now()) - 30_000 // 30s buffer
-    if (expiresIn > 0) {
-      tokenExpiryRef.current = setTimeout(() => logout(), expiresIn)
+    // Auto-clear when token expires (add 30s buffer)
+    if (expiryTimerRef.current) clearTimeout(expiryTimerRef.current)
+    const ms = ((expiresIn || 3600) - 30) * 1000
+    if (ms > 0) {
+      expiryTimerRef.current = setTimeout(() => {
+        setAccessTokenState(null)
+        sessionStorage.removeItem('cw_access_token')
+      }, ms)
     }
   }, [])
 
   const logout = useCallback(() => {
     googleLogout()
-    setIdToken(null)
+    setAccessTokenState(null)
     setUser(null)
-    sessionStorage.removeItem('cw_token')
+    sessionStorage.removeItem('cw_access_token')
     sessionStorage.removeItem('cw_user')
-    if (tokenExpiryRef.current) clearTimeout(tokenExpiryRef.current)
+    if (expiryTimerRef.current) clearTimeout(expiryTimerRef.current)
   }, [])
 
   return (
-    <AuthContext.Provider value={{ idToken, user, login, logout, isAuthenticated: !!idToken }}>
+    <AuthContext.Provider value={{
+      accessToken,
+      user,
+      storeToken,
+      logout,
+      isAuthenticated: !!accessToken,
+    }}>
       {children}
     </AuthContext.Provider>
   )
